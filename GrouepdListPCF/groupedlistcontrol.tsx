@@ -28,7 +28,17 @@ var CRM_TEST_MODE = 0;
 const toggleStyles: Partial<IToggleStyles> = { root: { marginBottom: '20px' } };
 const groupCount = 3;
 const groupDepth = 3;
-const items = createListItems(Math.pow(groupCount, groupDepth + 1));
+
+//const items = createListItems(Math.pow(groupCount, groupDepth + 1));
+const items = [{"key":"key1","text":"text1"},
+                {"key":"key2","text":"text2"},
+                {"key":"key3","text":"text3"},
+                {"key":"key4","text":"text4"},
+                {"key":"key5","text":"text5"}
+              ];
+                
+                // { key: 'thumbnail', name: 'thumbnail', fieldName: 'thumbnail', minWidth: 300 }
+
                 /*
                 color: "green"
                 description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in"
@@ -40,6 +50,7 @@ const items = createListItems(Math.pow(groupCount, groupDepth + 1));
                 thumbnail: "//via.placeholder.com/151x151"
                 width: 151
                 */
+
 const columns = Object.keys(items[0])
                 .slice(0, 3)
                 .map(
@@ -50,14 +61,22 @@ const columns = Object.keys(items[0])
                         minWidth: 300,
                     }),
                 );
+                
                 /*
                 fieldName: "thumbnail"
                 key: "thumbnail"
                 minWidth: 300
                 name: "thumbnail"                
                 */
-
-  const groups = createGroups(groupCount, groupDepth, 0, groupCount);
+                
+  //const groups = createGroups(groupCount, groupDepth, 0, groupCount);
+const groups = [{"count":5,"startIndex":0,"key":"groupkey0","level":0,"name":"groupname0",
+                    "children":[
+                            {"count":3,"startIndex":0,"key":"groupkey1","level":1,"name":"groupname1","children":[]},
+                            {"count":2,"startIndex":3,"key":"groupkey2","level":1,"name":"groupname2","children":[]},
+                    ]},
+               ];
+               
                 /*
                 children: (3) [{…}, {…}, {…}]
                 count:27
@@ -85,7 +104,7 @@ function GroupedListControl(props:any) {
                     let grp = groups;
                     
                     let selItems = selectedItems;
-
+                    
                     debugger;
                     
                 });
@@ -96,7 +115,6 @@ function GroupedListControl(props:any) {
         
         return s;
     });
-
 
     const onRenderCell = (
         nestingDepth?: number,
