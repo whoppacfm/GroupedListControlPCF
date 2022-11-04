@@ -6,11 +6,14 @@ import * as ReactDOM from 'react-dom';
 import { ComponentStyles } from '@fluentui/react';
 
 import { GroupedList, IGroup, IGroupedListStyles } from '@fluentui/react/lib/GroupedList';
-import { IColumn, DetailsRow } from '@fluentui/react/lib/DetailsList';
+import { IColumn, DetailsRow, IDetailsRowStyles } from '@fluentui/react/lib/DetailsList';
 import { Selection, SelectionMode, SelectionZone } from '@fluentui/react/lib/Selection';
 import { Toggle, IToggleStyles } from '@fluentui/react/lib/Toggle';
 import { useBoolean, useConst } from '@fluentui/react-hooks';
 import { createListItems, createGroups, IExampleItem } from '@fluentui/example-data';
+
+import './groupedListControlStyles.css';
+
 
 //----------------------------
 //Testing/System/DataSource
@@ -27,6 +30,8 @@ var CRM_TEST_MODE = 0;
 //----------------------------
 const toggleStyles: Partial<IToggleStyles> = { root: { marginBottom: '20px' } };
 const groupedListSyles: Partial<IGroupedListStyles> = { root: { textAlign: 'left' } };
+const detailsRowStyles: Partial<IDetailsRowStyles> = { root: { marginLeft:"150px" } };
+//fluentui classes are overwritten in groupedListControlStyles.css
 
 //----------------------------
 //List Data
@@ -34,12 +39,18 @@ const groupedListSyles: Partial<IGroupedListStyles> = { root: { textAlign: 'left
 //const groupCount = 3;
 //const groupDepth = 3;
 
+interface IListDataItem {
+    key:string;
+    text:string;
+    description:string;
+}
+
 //const items = createListItems(Math.pow(groupCount, groupDepth + 1));
-const items = [{"key":"key1","text":"text1"},
-                {"key":"key2","text":"text2"},
-                {"key":"key3","text":"text3"},
-                {"key":"key4","text":"text4"},
-                {"key":"key5","text":"text5"}
+const items = [{"key":"key1","text":"text1","description":"description1"},
+                {"key":"key2","text":"text2","description":"description2"},
+                {"key":"key3","text":"text3","description":"description3"},
+                {"key":"key4","text":"text4","description":"description4"},
+                {"key":"key5","text":"text5","description":""}
               ];
                 
                 // { key: 'thumbnail', name: 'thumbnail', fieldName: 'thumbnail', minWidth: 300 }
@@ -74,7 +85,7 @@ const columns = Object.keys(items[0])
                 name: "thumbnail"                
                 */
                 
-  //const groups = createGroups(groupCount, groupDepth, 0, groupCount);
+//const groups = createGroups(groupCount, groupDepth, 0, groupCount);
 const groups = [{"count":5,"startIndex":0,"key":"groupkey0","level":0,"name":"groupname0",
                     "children":[
                             {"count":3,"startIndex":0,"key":"groupkey1","level":2,"name":"groupname1","children":[]},
@@ -123,12 +134,13 @@ function GroupedListControl(props:any) {
 
     const onRenderCell = (
         nestingDepth?: number,
-        item?: IExampleItem,
+        item?: IListDataItem,
         itemIndex?: number,
         group?: IGroup,
     ): React.ReactNode => {
         return item && typeof itemIndex === 'number' && itemIndex > -1 ? (
             <DetailsRow
+                styles={detailsRowStyles}
                 columns={columns}
                 groupNestingDepth={nestingDepth}
                 item={item}
@@ -140,7 +152,7 @@ function GroupedListControl(props:any) {
             />
         ) : null;
     };    
-    
+
     return (
         <div>
             <Toggle
