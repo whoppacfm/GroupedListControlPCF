@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import * as ReactDOM from 'react-dom';
 import { ComponentStyles } from '@fluentui/react';
 
-import { GroupedList, IGroup } from '@fluentui/react/lib/GroupedList';
+import { GroupedList, IGroup, IGroupedListStyles } from '@fluentui/react/lib/GroupedList';
 import { IColumn, DetailsRow } from '@fluentui/react/lib/DetailsList';
 import { Selection, SelectionMode, SelectionZone } from '@fluentui/react/lib/Selection';
 import { Toggle, IToggleStyles } from '@fluentui/react/lib/Toggle';
@@ -26,8 +26,13 @@ var CRM_TEST_MODE = 0;
 //Component styles
 //----------------------------
 const toggleStyles: Partial<IToggleStyles> = { root: { marginBottom: '20px' } };
-const groupCount = 3;
-const groupDepth = 3;
+const groupedListSyles: Partial<IGroupedListStyles> = { root: { textAlign: 'left' } };
+
+//----------------------------
+//List Data
+//----------------------------
+//const groupCount = 3;
+//const groupDepth = 3;
 
 //const items = createListItems(Math.pow(groupCount, groupDepth + 1));
 const items = [{"key":"key1","text":"text1"},
@@ -58,7 +63,7 @@ const columns = Object.keys(items[0])
                         key: key,
                         name: key,
                         fieldName: key,
-                        minWidth: 300,
+                        minWidth: 10,
                     }),
                 );
                 
@@ -72,8 +77,8 @@ const columns = Object.keys(items[0])
   //const groups = createGroups(groupCount, groupDepth, 0, groupCount);
 const groups = [{"count":5,"startIndex":0,"key":"groupkey0","level":0,"name":"groupname0",
                     "children":[
-                            {"count":3,"startIndex":0,"key":"groupkey1","level":1,"name":"groupname1","children":[]},
-                            {"count":2,"startIndex":3,"key":"groupkey2","level":1,"name":"groupname2","children":[]},
+                            {"count":3,"startIndex":0,"key":"groupkey1","level":2,"name":"groupname1","children":[]},
+                            {"count":2,"startIndex":3,"key":"groupkey2","level":2,"name":"groupname2","children":[]},
                     ]},
                ];
                
@@ -136,11 +141,6 @@ function GroupedListControl(props:any) {
         ) : null;
     };    
     
-    function _onChange() {
-        let args = arguments;
-        //props.theobj.changeFunction();
-    }
-
     return (
         <div>
             <Toggle
@@ -153,6 +153,7 @@ function GroupedListControl(props:any) {
             />
             <SelectionZone selection={selection} selectionMode={SelectionMode.multiple}>
             <GroupedList
+                styles={groupedListSyles}
                 items={items}
                 // eslint-disable-next-line react/jsx-no-bind
                 onRenderCell={onRenderCell}
