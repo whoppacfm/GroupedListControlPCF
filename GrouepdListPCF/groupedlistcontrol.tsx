@@ -15,6 +15,10 @@ import { createListItems, createGroups, IExampleItem } from '@fluentui/example-d
 import './groupedListControlStyles.css';
 
 
+//Example Implementation from Microsoft Developer: https://github.com/AJIXuMuK/SPFx/tree/master/ouifr-grouped-details-list
+//Dynamically load group items with _onToggleCollapse example: https://sharepoint.stackexchange.com/questions/265390/fabric-ui-detailslist-component-dynamically-load-group-items
+
+
 //----------------------------
 //Testing/System/DataSource
 //----------------------------
@@ -40,8 +44,8 @@ const detailsRowStyles: Partial<IDetailsRowStyles> = { root: { marginLeft:"150px
 //const groupDepth = 3;
 
 interface IListDataItem {
-    key:string;
-    text:string;
+    //key:string;
+    //text:string;
     description:string;
 }
 
@@ -67,6 +71,7 @@ const items = [{"key":"key1","text":"text1","description":"description1"},
                 width: 151
                 */
 
+                /*
 const columns = Object.keys(items[0])
                 .slice(0, 3)
                 .map(
@@ -77,7 +82,16 @@ const columns = Object.keys(items[0])
                         minWidth: 10,
                     }),
                 );
-                
+                */
+
+const columns : IColumn[] = [{
+        key: 'text',
+        name: 'Text',
+        fieldName: 'text',
+        minWidth: 50,
+        maxWidth: 200
+    }];
+
                 /*
                 fieldName: "thumbnail"
                 key: "thumbnail"
