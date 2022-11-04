@@ -14,10 +14,8 @@ import { createListItems, createGroups, IExampleItem } from '@fluentui/example-d
 
 import './groupedListControlStyles.css';
 
-
 //Example Implementation from Microsoft Developer: https://github.com/AJIXuMuK/SPFx/tree/master/ouifr-grouped-details-list
 //Dynamically load group items with _onToggleCollapse example: https://sharepoint.stackexchange.com/questions/265390/fabric-ui-detailslist-component-dynamically-load-group-items
-
 
 //----------------------------
 //Testing/System/DataSource
@@ -128,15 +126,8 @@ function GroupedListControl(props:any) {
         const s = new Selection({
             onSelectionChanged: () => {
                 s.getSelection().forEach((p1:any,p2:any,selectedItems:any) => {
-                    
-                    let cols = columns;
-                    let itm = items;
-                    let grp = groups;
-                    
                     let selItems = selectedItems;
-                    
                     debugger;
-                    
                 });
             }
         });
