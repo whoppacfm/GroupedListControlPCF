@@ -1,16 +1,21 @@
 //----------------------------
-//Imports
+//React
 //----------------------------
-
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import * as ReactDOM from 'react-dom';
+import { ComponentStyles } from '@fluentui/react';
 
-import { DefaultButton } from '@fluentui/react/lib/Button';
-import { ISearchBoxStyles, SearchBox } from '@fluentui/react/lib/SearchBox';
-import { Icon } from '@fluentui/react/lib/Icon';
-import { IContextualMenuListProps, IContextualMenuItem } from '@fluentui/react/lib/ContextualMenu';
-import { IRenderFunction } from '@fluentui/react/lib/Utilities';
-import { IComboBoxOption, IComboBoxStyles, VirtualizedComboBox } from '@fluentui/react';
+import { GroupedList, IGroup, IGroupedListStyles } from '@fluentui/react/lib/GroupedList';
+import { IColumn, DetailsRow, IDetailsRowStyles } from '@fluentui/react/lib/DetailsList';
+import { Selection, SelectionMode, SelectionZone } from '@fluentui/react/lib/Selection';
+import { Toggle, IToggleStyles } from '@fluentui/react/lib/Toggle';
+import { useBoolean, useConst } from '@fluentui/react-hooks';
+import { createListItems, createGroups, IExampleItem } from '@fluentui/example-data';
+
+import './groupedListControlStyles.css';
+
+//Example Implementation from Microsoft Developer: https://github.com/AJIXuMuK/SPFx/tree/master/ouifr-grouped-details-list
+//Dynamically load group items with _onToggleCollapse example: https://sharepoint.stackexchange.com/questions/265390/fabric-ui-detailslist-component-dynamically-load-group-items
 
 //----------------------------
 //Testing/System/DataSource
@@ -22,222 +27,168 @@ if(href.indexOf("127.") > -1 || href.indexOf("localhost") > -1) {
 }
 var CRM_TEST_MODE = 0;
 
-const filteredItemsStyle: React.CSSProperties = {
-  width: '100%',
-  height: '100px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-const searchBoxStyles: ISearchBoxStyles = {
-  root: { margin: '8px' },
-};
-
-/*
-const menuItems: IContextualMenuItem[] = [
-  { key: '0', text: 'New', onClick: () => console.log('New clicked') },
-  { key: '1', text: 'Rename', onClick: () => console.log('Rename clicked') },
-  { key: '2', text: 'Edit', onClick: () => console.log('Edit clicked') },
-  { key: '3', text: 'Properties', onClick: () => console.log('Properties clicked') },
-  { key: '4', text: 'Link same window', href: 'http://bing.com' },
-  { key: '5', text: 'Link new window', href: 'http://bing.com', target: '_blank' },
-  {
-    key: '6',
-    text: 'Link click',
-    href: 'http://bing.com',
-    onClick: (ev: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
-      alert('Link clicked');
-      ev.preventDefault();
-    },
-    target: '_blank',
-  },
-  {
-    key: '7',
-    text: 'Disabled item',
-    disabled: true,
-    onClick: () => console.error('Disabled item should not be clickable.'),
-  },
-];
-*/
-
-
+//----------------------------
+//Component styles
+//----------------------------
+const toggleStyles: Partial<IToggleStyles> = { root: { marginBottom: '20px' } };
+const groupedListSyles: Partial<IGroupedListStyles> = { root: { textAlign: 'left' } };
+const detailsRowStyles: Partial<IDetailsRowStyles> = { root: { marginLeft:"150px" } };
+//fluentui classes are overwritten in groupedListControlStyles.css
 
 //----------------------------
-//SearchSelectControl
+//List Data
 //----------------------------
-const SearchSelectControl : React.FunctionComponent = (props:any) => {
+//const groupCount = 3;
+//const groupDepth = 3;
 
-  const [items, setItems] = React.useState(Array<IContextualMenuItem>);
-  const [origItems, setOrigItems] = React.useState(Array<IContextualMenuItem>);
+interface IListDataItem {
+    //key:string;
+    //text:string;
+    description:string;
+}
 
-  const [itemsc, setItemsc] = React.useState(Array<IComboBoxOption>);
-  const [origItemsc, setOrigItemsc] = React.useState(Array<IComboBoxOption>);
+//const items = createListItems(Math.pow(groupCount, groupDepth + 1));
+const items = [{"key":"key1","text":"text1","description":"description1"},
+                {"key":"key2","text":"text2","description":"description2"},
+                {"key":"key3","text":"text3","description":"description3"},
+                {"key":"key4","text":"text4","description":"description4"},
+                {"key":"key5","text":"text5","description":""}
+              ];
+                
+                // { key: 'thumbnail', name: 'thumbnail', fieldName: 'thumbnail', minWidth: 300 }
 
-  const onSelectItem = (evt:any, selectedItem:any) => {
-    let selectedItemKey = selectedItem.key;
-    let selectedItemText = selectedItem.text;
-    alert(selectedItemKey + " - " + selectedItemText);
-  }
-  
+                /*
+                color: "green"
+                description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in"
+                height: 151
+                key: "item-2 Lorem ipsum dolor sit"
+                location: "New York"
+                name: "Lorem ipsum dolor sit amet,"
+                shape: "triangle"
+                thumbnail: "//via.placeholder.com/151x151"
+                width: 151
+                */
 
+                /*
+const columns = Object.keys(items[0])
+                .slice(0, 3)
+                .map(
+                    (key: string): IColumn => ({
+                        key: key,
+                        name: key,
+                        fieldName: key,
+                        minWidth: 10,
+                    }),
+                );
+                */
 
-  if(origItems==null || origItems.length==0) {
-    let dataItems: IContextualMenuItem[] = [
-      { key: '0', text: 'Item 1', onClick: onSelectItem },
-      { key: '1', text: 'Item 2', onClick: onSelectItem },
-      { key: '2', text: 'Item 3', onClick: onSelectItem },
-    ];
+const columns : IColumn[] = [{
+        key: 'text',
+        name: 'Text',
+        fieldName: 'text',
+        minWidth: 50,
+        maxWidth: 200
+    }];
 
-    for(var i=5;i<100;i++) {
-      dataItems.push({ key: i+"", text: 'Item '+i, onClick: onSelectItem });
-    }
+                /*
+                fieldName: "thumbnail"
+                key: "thumbnail"
+                minWidth: 300
+                name: "thumbnail"                
+                */
+                
+//const groups = createGroups(groupCount, groupDepth, 0, groupCount);
+const groups = [{"count":5,"startIndex":0,"key":"groupkey0","level":0,"name":"groupname0",
+                    "children":[
+                            {"count":3,"startIndex":0,"key":"groupkey1","level":2,"name":"groupname1","children":[]},
+                            {"count":2,"startIndex":3,"key":"groupkey2","level":2,"name":"groupname2","children":[]},
+                    ]},
+               ];
+               
+                /*
+                children: (3) [{…}, {…}, {…}]
+                count:27
+                isCollapsed:undefined
+                key:"group0"
+                level:0
+                name:"group 0"
+                startIndex:0
+                */
 
-    setOrigItems(dataItems);
-    setItems(dataItems);
-  }
-  
-  if(origItemsc==null || origItemsc.length==0) {
-    const dataItems: IComboBoxOption[] = [];
-    
-    for (let i = 0; i < 100; i++) {
-      dataItems.push({
-        key: `${i}`,
-        text: `Option ${i}`,
-      });
-    }
+//----------------------------
+//GroupedListControl
+//----------------------------
+function GroupedListControl(props:any) {
 
-    setOrigItemsc(dataItems);
-    setItemsc(dataItems);
-  }
+    const [isCompactMode, { toggle: toggleIsCompactMode }] = useBoolean(false);
 
-  const onAbort = React.useCallback(() => {
-    setItems(origItems);
-  }, []);
+    const selection = useConst(() => {
+        const s = new Selection({
+            onSelectionChanged: () => {
+                s.getSelection().forEach((p1:any,p2:any,selectedItems:any) => {
+                    let selItems = selectedItems;
+                    debugger;
+                });
+            }
+        });
+        
+        s.setItems(items, true);
+        
+        return s;
+    });
 
-  const onAbortComboBoxSearch = React.useCallback(() => {
-    setItemsc(origItemsc);
-  }, []);
-  
-  
-  const onChangeComboBoxSearch = React.useCallback((ev: React.ChangeEvent<HTMLInputElement>, newValue: string) => {
-
-    const filteredItems = origItemsc.filter(
-      item => item.text && item.text.toLowerCase().indexOf(newValue.toLowerCase()) !== -1,
-    );
-
-    setItemsc(filteredItems);
-
-  }, [origItemsc]);
-
-
-  const onChange = React.useCallback((ev: React.ChangeEvent<HTMLInputElement>, newValue: string) => {
-
-    const filteredItems = origItems.filter(
-      item => item.text && item.text.toLowerCase().indexOf(newValue.toLowerCase()) !== -1,
-    );
-    
-    if (!filteredItems || !filteredItems.length) {
-      filteredItems.push({
-        key: 'no_results',
-        onRender: (item, dismissMenu) => (
-          <div key="no_results" style={filteredItemsStyle}>
-            <Icon iconName="SearchIssue" title="No items found" />
-            <span>No items found</span>
-          </div>
-        ),
-      });
-    }
-
-    setItems(filteredItems);
-
-  }, [origItems]);
-
-  const renderMenuList = React.useCallback(
-    (menuListProps: IContextualMenuListProps, defaultRender: IRenderFunction<IContextualMenuListProps>) => {
-      return (
-        <div>
-          <div style={{ borderBottom: '1px solid #ccc' }}>
-            <SearchBox
-              ariaLabel="Filter items by text"
-              placeholder="Filter Items"
-              onAbort={onAbort}
-              onChange={onChange}
-              styles={searchBoxStyles}
+    const onRenderCell = (
+        nestingDepth?: number,
+        item?: IListDataItem,
+        itemIndex?: number,
+        group?: IGroup,
+    ): React.ReactNode => {
+        return item && typeof itemIndex === 'number' && itemIndex > -1 ? (
+            <DetailsRow
+                styles={detailsRowStyles}
+                columns={columns}
+                groupNestingDepth={nestingDepth}
+                item={item}
+                itemIndex={itemIndex}
+                selection={selection}
+                selectionMode={SelectionMode.multiple}
+                compact={isCompactMode}
+                group={group}
             />
-          </div>
-          {defaultRender(menuListProps)}
-        </div>
-      );
-    },
-    [onAbort, onChange],
-  );
-  
-  const menuProps = React.useMemo(
-    () => ({
-      onRenderMenuList: renderMenuList,
-      title: 'Items',
-      shouldFocusOnMount: true,
-      items,
-    }),
-    [items, renderMenuList],
-  );
+        ) : null;
+    };    
 
-  //VirtualizedComboBox
-  const comboBoxStyles: Partial<IComboBoxStyles> = { root: { maxWidth: '300px' } };
-
-  const onRenderUpperContent = () => {
     return (
-      <div>
-          <SearchBox
-            ariaLabel="Filter items by text"
-            placeholder="Filter Items"
-            onAbort={onAbortComboBoxSearch}
-            onChange={onChangeComboBoxSearch}
-            styles={searchBoxStyles}
-          />
-      </div>
+        <div>
+            <Toggle
+                label="Enable compact mode"
+                checked={isCompactMode}
+                onChange={toggleIsCompactMode}
+                onText="Compact"
+                offText="Normal"
+                styles={toggleStyles}
+            />
+            <SelectionZone selection={selection} selectionMode={SelectionMode.multiple}>
+            <GroupedList
+                styles={groupedListSyles}
+                items={items}
+                // eslint-disable-next-line react/jsx-no-bind
+                onRenderCell={onRenderCell}
+                selection={selection}
+                selectionMode={SelectionMode.multiple}
+                groups={groups}
+                compact={isCompactMode}
+            />
+            </SelectionZone>
+        </div>
     )
-  }
-
-  return (
-    <>
-    <div>
-      <div style={{textAlign:"left"}}>
-        <p>Menu Item Selector with Searchbox</p>
-        <br/>
-        <DefaultButton text="Select Item" menuProps={menuProps} />
-        <br/><br/>
-        <p>Picklist Option Selector with Searchbox</p>
-        <br/>
-        <VirtualizedComboBox
-          onRenderUpperContent={onRenderUpperContent}
-          defaultSelectedKey="547"
-          label=""
-          allowFreeform
-          autoComplete="on"
-          options={itemsc}
-          dropdownMaxWidth={200}
-          useComboBoxAsMenuWidth
-          styles={comboBoxStyles}
-        /> 
-      </div>      
-    </div>      
-    </>
-  )
 }
 
 export function Render(context:any, container:any, theobj:object) {
-  
-  /* ReactDOM.render is deprecated, but FluentUI does not support new React version until now
-  const root = createRoot(container);
-  root.render(<div><SearchSelectControl context={context} theobj={theobj} /></div>);
-  */
- 
-  ReactDOM.render(
-      <div><SearchSelectControl context={context} theobj={theobj} /></div>
-    , container
-  );
-
+    ReactDOM.render(
+        <div><GroupedListControl context={context} theobj={theobj} /></div>
+      , container
+    );
 }
 
 
